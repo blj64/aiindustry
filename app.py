@@ -201,10 +201,10 @@ def main():
         )
 
         if model_choice == "SAM":
-            st.video("path/to/sam_video.mp4")
+            st.video("./videos/tmp_video.mp4")
         elif model_choice == "SAM2":
-            st.video("path/to/sam2_video.mp4")
+            st.video("./videos/tmp_video.mp4")
         elif model_choice == "GroundingDino":
-            st.video("path/to/groundingdino_video.mp4")
+            st.video("./videos/tmp_video.mp4")
 if __name__ == "__main__":
     main()
