@@ -149,7 +149,7 @@ def main():
         captions=[
             "OpenCv",
             "Detectron2, YOLO",
-            "SAM, SAM2, GroundingDino",
+            "SAM, SAM2",
         ],
     )
 
@@ -186,25 +186,63 @@ def main():
                 st.error("Failed to convert video. Please check the input file.")
 
     elif genre == "Entrainement Supervise":
-        result = yolo_model()
-        st.write(result)
 
-        uploaded_file = st.file_uploader("Choose a video for YOLO", type=['mp4', 'avi', 'wmv'])
-        
-        if uploaded_file is not None:
-            st.video(uploaded_file)
-
-    elif genre == "Entrainement Non-Supervise":
         model_choice = st.radio(
             "Choose Non-Supervised Model",
-            ["SAM", "SAM2", "GroundingDino"]
+            ["YOLO", "Detecron2"]
         )
 
+        if model_choice == "YOLO":
+            result = yolo_model()
+            st.write(result)
+
+            uploaded_file = st.file_uploader("Choose a video for YOLO", type=['mp4', 'avi', 'wmv'])
+            
+            if uploaded_file is not None:
+                st.video(uploaded_file)
+        
+        elif model_choice == "Detecron2":
+            if st.button("Video 1"):
+                st.video("./videos/P1_24h_01top_predictions.mp4")
+
+            if st.button("Video 2"):
+                st.video("./videos/P1_48h_02mid-detectron2.mp4")
+
+            if st.button("Video 3"):
+                st.video("./videos/P2_24h_01top_predictions.mp4")
+
+
+
+    elif genre == "Entrainement Non-Supervise":
+
+        model_choice = st.radio(
+            "Choose Non-Supervised Model",
+            ["SAM", "SAM + ALGO"]
+        )
+        st.write("Avec Algo est plus performante:")
+
         if model_choice == "SAM":
-            st.video("./videos/tmp_video.mp4")
-        elif model_choice == "SAM2":
-            st.video("./videos/tmp_video.mp4")
-        elif model_choice == "GroundingDino":
-            st.video("./videos/tmp_video.mp4")
+            if st.button("Video 1"):
+                st.video("./videos/P1_24h_01top_Sam_nul.mp4")
+
+            if st.button("Video 2"):
+                st.video("./videos/P1_48h_02mid_Sam_nul.mp4")
+
+            if st.button("Video 3"):
+                st.video("./videos/P2_24h_01top_Sam_nul.mp4")
+        
+        if model_choice == "SAM + ALGO":
+            if st.button("Video 1"):
+                st.video("./videos/P1_24h_01top_SAM_ALGO.mp4")
+
+            if st.button("Video 2"):
+                st.video("./videos/P1_48h_02mid_SAM_ALGO.mp4")
+
+            if st.button("Video 3"):
+                st.video("./videos/P2_24h_01top_SAM_ALGO.mp4")
+
+
+
+            
 if __name__ == "__main__":
     main()
