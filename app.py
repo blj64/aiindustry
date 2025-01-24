@@ -143,6 +143,9 @@ def process_video(video_path):
 def main():
     st.title('Daphnie Tracking Video Processor')
 
+    dirname = 'videos/'
+    video_name = st.radio("Choose a video", ["P1_24h_01top.mp4", "P1_48h_02mid.mp4", "P2_24h_01top.mp4"])
+
     genre = st.radio(
         "Choose Analysis Method",
         ["Analyse Classique", "Entrainement Supervise", "Entrainement Non-Supervise"],
@@ -154,36 +157,10 @@ def main():
     )
 
     if genre == "Analyse Classique":
-        uploaded_file = st.file_uploader("Choose a .wmv video", type=['wmv'])
         
-        if uploaded_file is not None:
-            # Save uploaded file temporarily
-            with open('temp_video.wmv', 'wb') as f:
-                f.write(uploaded_file.getvalue())
-            
-            st.write('Video uploaded successfully. Processing...')
-            
-            # Process video
-            processed_video_path = process_video('temp_video.wmv')
-            
-            # Attempt to convert video to web-compatible format
-            converted_video_path = 'outputs/web_video.mp4'
-            if convert_video(processed_video_path, converted_video_path):
-                # Display video
-                with open(converted_video_path, 'rb') as video_file:
-                    video_bytes = video_file.read()
-                
-                st.video(video_bytes)
-                
-                # Optional download
-                st.download_button(
-                    label="Download Processed Video",
-                    data=video_bytes,
-                    file_name='processed_video.mp4',
-                    mime='video/mp4'
-                )
-            else:
-                st.error("Failed to convert video. Please check the input file.")
+        # Process video
+        st.video(dirname + video_name.split('.')[0] + "_ALGO.mp4")
+        #st.video(dirname + ???)
 
     elif genre == "Entrainement Supervise":
 
@@ -193,23 +170,12 @@ def main():
         )
 
         if model_choice == "YOLO":
-            result = yolo_model()
-            st.write(result)
-
-            uploaded_file = st.file_uploader("Choose a video for YOLO", type=['mp4', 'avi', 'wmv'])
-            
-            if uploaded_file is not None:
-                st.video(uploaded_file)
+            #result = yolo_model()
+            st.video(dirname + video_name.split('.')[0] + "_YOLO.mp4")
+            #st.video(dirname + video_name)
         
         elif model_choice == "Detecron2":
-            if st.button("Video 1"):
-                st.video("./videos/P1_24h_01top_predictions.mp4")
-
-            if st.button("Video 2"):
-                st.video("./videos/P1_48h_02mid-detectron2.mp4")
-
-            if st.button("Video 3"):
-                st.video("./videos/P2_24h_01top_predictions.mp4")
+            st.video(dirname + video_name.split('.')[0] + "_detectron2.mp4")
 
 
 
@@ -222,24 +188,10 @@ def main():
         st.write("Avec Algo est plus performante:")
 
         if model_choice == "SAM":
-            if st.button("Video 1"):
-                st.video("./videos/P1_24h_01top_Sam_nul.mp4")
-
-            if st.button("Video 2"):
-                st.video("./videos/P1_48h_02mid_Sam_nul.mp4")
-
-            if st.button("Video 3"):
-                st.video("./videos/P2_24h_01top_Sam_nul.mp4")
+            st.video(dirname + video_name.split('.')[0] + "_Sam_nul.mp4")
         
         if model_choice == "SAM + ALGO":
-            if st.button("Video 1"):
-                st.video("./videos/P1_24h_01top_SAM_ALGO.mp4")
-
-            if st.button("Video 2"):
-                st.video("./videos/P1_48h_02mid_SAM_ALGO.mp4")
-
-            if st.button("Video 3"):
-                st.video("./videos/P2_24h_01top_SAM_ALGO.mp4")
+            st.video(dirname + video_name.split('.')[0] + "_SAM_ALGO.mp4")
 
 
 
