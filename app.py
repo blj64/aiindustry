@@ -6,7 +6,7 @@ import math
 import os
 import subprocess
 
-def get_closest(tracking, x, y, w, h):
+def classic_analys(tracking, x, y, w, h):
     str_name = "abcdefghijqlmnopqrstuvwxyz"
     min_dist = 1000000000000
     mini = ""
@@ -24,6 +24,9 @@ def get_closest(tracking, x, y, w, h):
         mini = str_name[len(tracking.keys())]
     
     return mini
+
+def yolo_model():
+    return 'oui'
 
 def convert_video(input_path, output_path):
     """Convert video to web-compatible format using ffmpeg"""
@@ -57,6 +60,8 @@ def process_video(video_path):
 
     # Ensure output directory exists
     os.makedirs('outputs', exist_ok=True)
+    if os.path.exists('outputs/web_video.mp4'):
+        os.remove('outputs/web_video.mp4')
     output_path = 'outputs/processed_video.mp4'
 
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
@@ -110,7 +115,7 @@ def process_video(video_path):
         if ct_in_frame < 15:
             for (i, contour) in enumerate(contours):
                 x, y, w, h = cv2.boundingRect(contour)
-                ll = get_closest(tracking, x, y, w, h)
+                ll = classic_analys(tracking, x, y, w, h)
 
                 if ll in tracking:
                     tracking[ll].append((x, y, w, h))
@@ -137,37 +142,69 @@ def process_video(video_path):
 
 def main():
     st.title('Daphnie Tracking Video Processor')
-    
-    uploaded_file = st.file_uploader("Choose a .wmv video", type=['wmv'])
-    
-    if uploaded_file is not None:
-        # Save uploaded file temporarily
-        with open('temp_video.wmv', 'wb') as f:
-            f.write(uploaded_file.getvalue())
-        
-        st.write('Video uploaded successfully. Processing...')
-        
-        # Process video
-        processed_video_path = process_video('temp_video.wmv')
-        
-        # Attempt to convert video to web-compatible format
-        converted_video_path = 'outputs/web_video.mp4'
-        if convert_video(processed_video_path, converted_video_path):
-            # Display video
-            with open(converted_video_path, 'rb') as video_file:
-                video_bytes = video_file.read()
-            
-            st.video(video_bytes)
-            
-            # Optional download
-            st.download_button(
-                label="Download Processed Video",
-                data=video_bytes,
-                file_name='processed_video.mp4',
-                mime='video/mp4'
-            )
-        else:
-            st.error("Failed to convert video. Please check the input file.")
 
+    genre = st.radio(
+        "Choose Analysis Method",
+        ["Analyse Classique", "Entrainement Supervise", "Entrainement Non-Supervise"],
+        captions=[
+            "OpenCv",
+            "Detectron2, YOLO",
+            "SAM, SAM2, GroundingDino",
+        ],
+    )
+
+    if genre == "Analyse Classique":
+        uploaded_file = st.file_uploader("Choose a .wmv video", type=['wmv'])
+        
+        if uploaded_file is not None:
+            # Save uploaded file temporarily
+            with open('temp_video.wmv', 'wb') as f:
+                f.write(uploaded_file.getvalue())
+            
+            st.write('Video uploaded successfully. Processing...')
+            
+            # Process video
+            processed_video_path = process_video('temp_video.wmv')
+            
+            # Attempt to convert video to web-compatible format
+            converted_video_path = 'outputs/web_video.mp4'
+            if convert_video(processed_video_path, converted_video_path):
+                # Display video
+                with open(converted_video_path, 'rb') as video_file:
+                    video_bytes = video_file.read()
+                
+                st.video(video_bytes)
+                
+                # Optional download
+                st.download_button(
+                    label="Download Processed Video",
+                    data=video_bytes,
+                    file_name='processed_video.mp4',
+                    mime='video/mp4'
+                )
+            else:
+                st.error("Failed to convert video. Please check the input file.")
+
+    elif genre == "Entrainement Supervise":
+        result = yolo_model()
+        st.write(result)
+
+        uploaded_file = st.file_uploader("Choose a video for YOLO", type=['mp4', 'avi', 'wmv'])
+        
+        if uploaded_file is not None:
+            st.video(uploaded_file)
+
+    elif genre == "Entrainement Non-Supervise":
+        model_choice = st.radio(
+            "Choose Non-Supervised Model",
+            ["SAM", "SAM2", "GroundingDino"]
+        )
+
+        if model_choice == "SAM":
+            st.video("path/to/sam_video.mp4")
+        elif model_choice == "SAM2":
+            st.video("path/to/sam2_video.mp4")
+        elif model_choice == "GroundingDino":
+            st.video("path/to/groundingdino_video.mp4")
 if __name__ == "__main__":
     main()
